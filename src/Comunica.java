@@ -1,18 +1,15 @@
 /*
  * Example of a Fenetre (JFrame) using awt and swing
- * @author your_name
+ * @author mdesousa
  */
 
-import java.awt.BorderLayout;
 import java.awt.GridLayout;
-
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.*;
+
 
 public class Comunica extends JFrame {
 
@@ -31,48 +28,27 @@ public class Comunica extends JFrame {
 
     /** Creates a Fenetre */
     public Comunica(BufferedReader reader, BufferedWriter writer) {
+        this.reader = reader;
+        this.writer = writer;
         initComponents();
-        //On crée un FileWriter et un FileReader
-        //pour utiliser A2B.txt et B2A.txt
-
-        //les buffer permettent de d'acceder aux info
-        //et mettre en place la communication
-
-        // !!! BufferedWriter.flush() aprés chaque écriture !!!
-        // pour vider le contenu du buffer.
-
-        //Les fichiers pourront stocker à chaque envoie la ligne produit (message to send)
-        //Les fichiers permettront de récupérer chaque ligne (received message)
-
-
-        //Les opérations sur les entrées et les sorties sont susceptibles de produire des erreurs
-        //(par exemple fichier inexistant). Les exceptions devront être capturés
-        //(et en conséquence traités et au moins afficher sur la ligne de commande) ou propagés.
     }
 
 
-    private void Send ()throws IOException
+    private void send ()throws IOException
     {
-
-        File outputFile = new File("A2B.txt");
-        FileWriter out = new FileWriter(outputFile,true);
-        BufferedWriter writer = new BufferedWriter(out);
 
         writer.write(textToSend.getText());
         writer.newLine();
         writer.flush();
 
         writer.close();
-        out.close();
+
 
         System.out.println("bSend pressed !");
         textToSend.setText(""); // On clean le carré d'envoi
     }
-    private void Receive()throws IOException
+    private void receive()throws IOException
     {
-        File inputFile = new File("A2B.txt");
-        FileReader in = new FileReader(inputFile);
-        BufferedReader reader = new BufferedReader(in);
 
         String line;
         line = reader.readLine();
@@ -80,7 +56,7 @@ public class Comunica extends JFrame {
 
 
         reader.close();
-        in.close();
+
 
         System.out.println("bReceive pressed");
     }
@@ -123,23 +99,20 @@ public class Comunica extends JFrame {
 
 
 
-        this.bSend.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                //TODO
-
-                    try {
-                        Send();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+        this.bSend.addActionListener(event -> {
+             {
+                try {
+                    send();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
             }
         });
-        this.bReceive.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                //TODO
+        this.bReceive.addActionListener(event -> {
+            {
                 try {
-                    Receive();
+                    receive();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -154,12 +127,37 @@ public class Comunica extends JFrame {
     /** main entry point */
     public static void main(String[] args) {
 
-        Comunica f = new Comunica(null,null);
+        String filename1 = "B2A.txt";
+        String filename2 = "A2B.txt";
+
+        if (0 == Integer.parseInt(args[0])) //Client
+        {
+            filename1 = "A2B.txt";
+            filename2 = "B2A.txt";
+        }
+
+
+        try
+        {
+            FileWriter out = new FileWriter(new File(filename1), true);
+            BufferedWriter writer = new BufferedWriter(out);
+            FileReader in = new FileReader(new File(filename2));
+            BufferedReader reader = new BufferedReader(in);
+            Comunica f = new Comunica(reader, writer);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+
+
 
     }
 
-
-
-
-
 }
+
+
+
+
+
